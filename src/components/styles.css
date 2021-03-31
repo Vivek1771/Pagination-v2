@@ -1,0 +1,46 @@
+table {
+  table-layout: fixed;
+  width: 100%;
+  border: 3;
+}
+
+td {
+  border: 1px solid;
+  width: calc(100% / 3);
+}
+
+.cities {
+  padding-top: 150px;
+}
+
+.pageBtn {
+  width: 80%;
+  height: 40px;
+  list-style: none;
+  display: flex;
+  justify-content: center;
+}
+
+.pageBtn a {
+  padding: 10px;
+  margin: 8px;
+  border-radius: 5px;
+  border: 1px solid #ac25c7;
+  color: #2b2eff;
+  cursor: pointer;
+}
+
+.pageBtn a:hover {
+  color: white;
+  background-color: #289b91;
+}
+
+.pageActive a {
+  color: white;
+  background-color: #2bff47;
+}
+
+.pageDisabled a {
+  color: grey;
+  background-color: grey;
+}
