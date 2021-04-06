@@ -1,32 +1,41 @@
-import React, { useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useTable, usePagination } from "react-table";
 import "../styles/styles.css";
 import jsonData from "../json/cities.json";
 import column from "../columns/columns.js";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  displayData,
+  requestPage,
+  removePage,
+} from "../services/actions/action";
 
 const Pagination = () => {
   const data = useMemo(() => jsonData.slice(0, 200), []);
+  const dataPerPage = useMemo(() => data.slice(0, 10));
   const columns = column();
+  let [indexPage, setIndexPage] = useState(0);
 
-  const tableInstance = useTable({ columns, data }, usePagination);
+  const dispatch = useDispatch();
+  const dataFromState = useSelector((state) => state.pG.citiesData);
+  useEffect(() => {
+    dispatch(displayData(dataPerPage));
+  }, []);
+
+  const citiesPerPage = 10;
+  const pageCount = Math.ceil(data.length / citiesPerPage) - 1;
+
+  const tableInstance = useTable(
+    { columns, data: dataFromState },
+    usePagination
+  );
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     page,
-    nextPage,
-    canNextPage,
-    canPreviousPage,
-    pageOptions,
-    gotoPage,
-    pageCount,
-    state,
-    previousPage,
-    setPageSize,
     prepareRow,
   } = tableInstance;
-
-  const { pageIndex, pageSize } = state;
 
   return (
     <div style={{ paddingTop: "50px" }}>
@@ -62,45 +71,28 @@ const Pagination = () => {
       <br />
       <br />
       <div>
-        <span>
-          <strong>
-            Page {pageIndex + 1} of {pageOptions.length}
-          </strong>{" "}
-        </span>
-        <span>
-          ---- Go to Page No:{" "}
-          <input
-            type="number"
-            defaultValue={pageIndex + 1}
-            onChange={(e) => {
-              const pageNum = e.target.value ? Number(e.target.value) - 1 : 0;
-              gotoPage(pageNum);
-            }}
-            style={{ width: "60px" }}
-          />
-        </span>
-        <select
-          value={pageSize}
-          onChange={(e) => setPageSize(Number(e.target.value))}
+        <button
+          onClick={() => {
+            setIndexPage(indexPage - 1);
+            dispatch(removePage(data, indexPage - 1));
+          }}
+          disabled={indexPage === 0}
         >
-          {[10, 20, 30].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
-              Cities/Page: {pageSize}
-            </option>
-          ))}
-        </select>
-        <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-          Go to First Page
-        </button>
-        <button onClick={() => previousPage()} disabled={!canPreviousPage}>
           Previous
-        </button>
-        <button onClick={() => nextPage()} disabled={!canNextPage}>
+        </button>{" "}
+        <button
+          onClick={() => {
+            setIndexPage(indexPage + 1);
+            dispatch(requestPage(data, indexPage + 1));
+          }}
+          disabled={indexPage === pageCount}
+        >
           Next
         </button>
-        <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
-          Go to Last Page
-        </button>
+        <br />
+        <b>
+          Page {indexPage} of {pageCount}
+        </b>
       </div>
     </div>
   );
